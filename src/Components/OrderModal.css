@@ -1,0 +1,149 @@
+/* src/components/OrderModal.css */
+.order-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 30px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+
+.order-modal.success {
+  text-align: center;
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #999;
+}
+
+.order-modal h2 {
+  margin-bottom: 20px;
+  color: #1a1a2e;
+  font-size: 24px;
+}
+
+.order-summary {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+}
+
+.order-summary h3 {
+  margin-bottom: 12px;
+  color: #1a1a2e;
+}
+
+.selected-options {
+  margin: 15px 0;
+  padding: 10px 0;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.selected-options p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.total-price {
+  margin-top: 15px;
+  font-size: 18px;
+  color: #1a1a2e;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #d4af37;
+}
+
+.place-order-btn {
+  width: 100%;
+  background: #d4af37;
+  color: #1a1a2e;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.place-order-btn:hover:not(:disabled) {
+  background: #c4a030;
+}
+
+.place-order-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.order-note {
+  font-size: 11px;
+  color: #999;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.success-icon {
+  width: 70px;
+  height: 70px;
+  background: #4caf50;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  margin: 0 auto 20px;
+}
+
+.close-modal-btn {
+  background: #1a1a2e;
+  color: #fff;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .order-modal {
+    padding: 20px;
+  }
+  
+  .order-modal h2 {
+    font-size: 20px;
+  }
+}
