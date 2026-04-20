@@ -1,6 +1,6 @@
 // src/pages/TestSizePage.jsx
 import React, { useState } from 'react';
-import SizeSelector from '../components/SizeSelector';
+import SizeSelector from '../Components/SizeSelector';
 import './TestSizePage.css';
 
 const TestSizePage = () => {
@@ -19,6 +19,15 @@ const TestSizePage = () => {
 
       {/* Main Size Component */}
       <SizeSelector onSizeSelect={handleSizeSelect} />
+
+      {selectedSizeData && (
+        <div className="testing-info">
+          <h3>Selected Size:</h3>
+          <p>
+            Size {selectedSizeData.size} ({selectedSizeData.mm})
+          </p>
+        </div>
+      )}
 
       {/* Testing Information */}
       <div className="testing-info">

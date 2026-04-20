@@ -1,14 +1,18 @@
-// src/components/ProductCard.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  formatPrice,
+  getProductImage,
+  getProductPrice,
+  getProductTitle,
+} from "../utils/storeProduct";
 import "./ProductCard.css";
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
-
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-IN").format(price);
-  };
+  const productTitle = getProductTitle(product);
+  const productImage = getProductImage(product);
+  const displayPrice = formatPrice(getProductPrice(product));
 
   return (
     <div
@@ -16,16 +20,19 @@ const ProductCard = ({ product }) => {
       onClick={() => navigate(`/product/${product.id}`)}
     >
       <div className="product-image">
-        <img src={product.image} alt={product.name} />
+        {productImage ? (
+          <img src={productImage} alt={productTitle} />
+        ) : (
+          <div className="product-image-placeholder">No image</div>
+        )}
       </div>
       <div className="product-info">
         <div className="price-section">
-          <span className="current-price">₹{formatPrice(product.price)}</span>
-          <span className="compare-price">
-            ₹{formatPrice(product.comparePrice)}
+          <span className="current-price">
+            {displayPrice || "Price on request"}
           </span>
         </div>
-        <h3 className="product-name">{product.name}</h3>
+        <h3 className="product-name">{productTitle}</h3>
         <button className="check-delivery-btn">Check Delivery Date</button>
       </div>
     </div>

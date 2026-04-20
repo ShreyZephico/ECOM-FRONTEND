@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import "./SizeSelector.css";
 
-const SizeSelector = () => {
+const SizeSelector = ({ onSizeSelect }) => {
   // Complete size data with all variations
   const [sizes] = useState([
     {
@@ -193,6 +193,7 @@ const SizeSelector = () => {
   const handleSizeClick = (size) => {
     setSelectedSize(size);
     setShowDetails(true);
+    onSizeSelect?.(size);
   };
 
   return (

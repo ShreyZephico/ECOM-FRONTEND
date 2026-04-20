@@ -59,6 +59,15 @@
   transition: transform 0.3s ease;
 }
 
+.product-image-placeholder {
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #777;
+  background: #f2f2f2;
+}
+
 .main-image:hover {
   transform: scale(1.05);
 }
@@ -161,6 +170,12 @@
   color: #1a1a2e;
   font-weight: 600;
   margin: 0;
+}
+
+.product-description {
+  color: #555;
+  line-height: 1.6;
+  margin: -8px 0 0;
 }
 
 /* Quantity Section */

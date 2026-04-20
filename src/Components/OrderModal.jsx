@@ -1,5 +1,5 @@
-// src/components/OrderModal.jsx
 import React, { useState } from "react";
+import { formatPrice, getProductTitle } from "../utils/storeProduct";
 import "./OrderModal.css";
 
 const OrderModal = ({
@@ -7,6 +7,7 @@ const OrderModal = ({
   selectedSize,
   selectedMetal,
   selectedDiamond,
+  quantity,
   totalPrice,
   onClose,
 }) => {
@@ -20,27 +21,30 @@ const OrderModal = ({
     e.preventDefault();
     setLoading(true);
 
-    // Simulate API call - Replace with actual order API
     setTimeout(() => {
       console.log("Order placed:", {
-        product: product.name,
+        product: getProductTitle(product),
+        productId: product?.id,
         email,
         name,
         phone,
+        quantity,
         size: selectedSize,
         metal: selectedMetal,
+        variantId: selectedMetal?.variant?.id,
         diamond: selectedDiamond,
         totalPrice,
       });
       setSubmitted(true);
       setLoading(false);
 
-      // Close modal after 3 seconds
       setTimeout(() => {
         onClose();
       }, 3000);
     }, 1500);
   };
+
+  const displayTotal = formatPrice(totalPrice) || "To be confirmed";
 
   if (submitted) {
     return (
@@ -49,10 +53,10 @@ const OrderModal = ({
           className="order-modal success"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="success-icon">✓</div>
+          <div className="success-icon">OK</div>
           <h2>Order Placed Successfully!</h2>
           <p>
-            We've sent a confirmation email to <strong>{email}</strong>
+            We have sent a confirmation email to <strong>{email}</strong>
           </p>
           <p>Our team will contact you shortly to confirm the order.</p>
           <button className="close-modal-btn" onClick={onClose}>
@@ -67,24 +71,25 @@ const OrderModal = ({
     <div className="modal-overlay" onClick={onClose}>
       <div className="order-modal" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>
-          ×
+          x
         </button>
 
         <h2>Complete Your Order</h2>
 
         <div className="order-summary">
-          <h3>{product.name}</h3>
+          <h3>{getProductTitle(product)}</h3>
           <div className="selected-options">
             {selectedSize && (
               <p>
-                📏 Size: {selectedSize.size} ({selectedSize.mm})
+                Size: {selectedSize.size} ({selectedSize.mm})
               </p>
             )}
-            {selectedMetal && <p>💍 Metal: {selectedMetal.name}</p>}
-            {selectedDiamond && <p>✨ Diamond: {selectedDiamond.quality}</p>}
+            {selectedMetal && <p>Metal: {selectedMetal.name}</p>}
+            {selectedDiamond && <p>Diamond: {selectedDiamond.quality}</p>}
+            <p>Quantity: {quantity}</p>
           </div>
           <div className="total-price">
-            <strong>Total Amount: ₹{totalPrice.toLocaleString("en-IN")}</strong>
+            <strong>Total Amount: {displayTotal}</strong>
           </div>
         </div>
 
@@ -127,7 +132,7 @@ const OrderModal = ({
         </form>
 
         <p className="order-note">
-          By placing this order, you agree to our terms and conditions. We'll
+          By placing this order, you agree to our terms and conditions. We will
           send order confirmation and updates to your email.
         </p>
       </div>

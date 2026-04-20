@@ -15,15 +15,7 @@ const Header = () => {
   return (
     <>
       <header className="header">
-        {/* Top Banner */}
-        <div className="header-top">
-          <div className="container">
-            <div className="promo-banner">
-              <span>Free £500 On completing your profile on the App</span>
-              <button className="install-app-btn">Install App</button>
-            </div>
-          </div>
-        </div>
+
 
         {/* Main Header */}
         <div className="header-main">
