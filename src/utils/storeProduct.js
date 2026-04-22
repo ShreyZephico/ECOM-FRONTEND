@@ -1,8 +1,8 @@
 export const getProductTitle = (product) =>
-  product?.title || product?.name || "Untitled product";
+  product?.title  || "Untitled product";
 
 export const getProductImage = (product) =>
-  product?.thumbnail || product?.image || product?.images?.[0]?.url || "";
+    product?.thumbnail || product?.images?.[0]?.url || "";
 
 export const getProductImages = (product) => {
   const images = product?.images?.map((image) => image.url).filter(Boolean) || [];
@@ -14,7 +14,6 @@ export const getProductImages = (product) => {
 export const getCleanDescription = (description) =>
   (description || "")
     .replace(/Status:\s*Published/gi, "")
-    .replace(/\s+/g, " ")
     .trim();
 
 export const getVariantPrice = (variant) => {
@@ -28,11 +27,17 @@ export const getVariantPrice = (variant) => {
 };
 
 export const getProductPrice = (product) => {
+  const homePrice = Number(product?.combination_min_price);
+  if (Number.isFinite(homePrice) && homePrice > 0) {
+    return homePrice;
+  }
+
   const variantWithPrice = product?.variants?.find(
     (variant) => getVariantPrice(variant) !== null,
   );
 
-  return variantWithPrice ? getVariantPrice(variantWithPrice) : null;
+  const price = variantWithPrice ? getVariantPrice(variantWithPrice) : null;
+  return Number.isFinite(Number(price)) && Number(price) > 0 ? Number(price) : null;
 };
 
 export const formatPrice = (amount) => {

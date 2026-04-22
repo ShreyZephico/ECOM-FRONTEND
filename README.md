@@ -1,17 +1,44 @@
-# React + Vite
+# E-COM Frontend (Vite + React Router)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Local development
 
-Currently, two official plugins are available:
+- **Install**:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm ci
+```
 
-## React Compiler
+- **Env**: copy `.env.example` → `.env.local` and fill:
+  - `VITE_STORE_PUBLISHABLE_API_KEY`
+  - (optional) `VITE_DEV_PROXY_TARGET` (defaults to `http://localhost:9000`)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Run**:
 
-## Expanding the ESLint configuration
+```bash
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-"# E-COM-Frontend" 
+The dev server proxies `/api`, `/store`, `/static` to `VITE_DEV_PROXY_TARGET`.
+
+## Production build
+
+```bash
+npm run build
+npm run preview
+```
+
+## Deployment notes
+
+- **SPA routing**: this app uses React Router. Your host must rewrite all routes to `/index.html` (deep links like `/product/123`).
+  - Netlify: `public/_redirects` is included.
+  - Vercel: `vercel.json` is included.
+  - Nginx: `nginx.conf` is included.
+
+- **Backend URL**: in production, prefer `VITE_STORE_API_BASE_URL=/api` and configure your platform/reverse-proxy to route `/api/*` to your backend.
+
+## Docker (optional)
+
+```bash
+docker build -t ringecom-frontend .
+docker run --rm -p 8080:80 ringecom-frontend
+```

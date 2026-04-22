@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchStoreProduct, customizeRing } from "../api/storeProducts";
+import {
+  fetchCombinationsByProductId,
+  fetchStoreProduct,
+  findVariant,
+  getProductOptions,
+} from "../api/storeProducts";
 import OrderModal from "../Components/OrderModal";
 import {
   formatPrice,
   getCleanDescription,
-  getMaterialOptions,
   getProductImage,
   getProductTitle,
-  getVariantByMaterial,
 } from "../utils/storeProduct";
 import "./ProductDetailPage.css";
 
@@ -16,35 +19,35 @@ const ProductDetailPage = () => {
   const { id } = useParams();
 
   const [product, setProduct] = useState(null);
+  const [variants, setVariants] = useState([]);
+  const [options, setOptions] = useState({ sizes: [], metals: [], diamonds: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [selectedSize, setSelectedSize] = useState(null);
-  const [selectedMetal, setSelectedMetal] = useState(null);
-  const [selectedDiamond, setSelectedDiamond] = useState(null);
-
-  const [apiPrice, setApiPrice] = useState(null);
-  const [loadingPrice, setLoadingPrice] = useState(false);
+  const [selectedSizeId, setSelectedSizeId] = useState(null);
+  const [selectedMetalId, setSelectedMetalId] = useState(null);
+  const [selectedDiamondId, setSelectedDiamondId] = useState(null);
 
   const [quantity, setQuantity] = useState(1);
   const [showOrderModal, setShowOrderModal] = useState(false);
 
-  // 🔥 LOAD PRODUCT
   useEffect(() => {
     const loadProduct = async () => {
       try {
         setLoading(true);
-        const storeProduct = await fetchStoreProduct(id);
+        setError("");
 
-        const materials = getMaterialOptions(storeProduct);
+        const storeProduct = await fetchStoreProduct(id);
+        const productVariants = await fetchCombinationsByProductId(id);
+        const derivedOptions = getProductOptions(productVariants);
 
         setProduct(storeProduct);
+        setVariants(productVariants);
+        setOptions(derivedOptions);
 
-        setSelectedSize({ size: 7 });
-        setSelectedMetal({
-          variant: getVariantByMaterial(storeProduct, materials[0]),
-        });
-        setSelectedDiamond({ quality: "IJ-SI" });
+        setSelectedSizeId(derivedOptions.sizes[0]?.id || null);
+        setSelectedMetalId(derivedOptions.metals[0]?.id || null);
+        setSelectedDiamondId(derivedOptions.diamonds[0]?.id || null);
       } catch (err) {
         console.error(err);
         setError("Unable to load product");
@@ -56,34 +59,16 @@ const ProductDetailPage = () => {
     loadProduct();
   }, [id]);
 
-  // 🔥 CUSTOM PRICE
-  useEffect(() => {
-    if (!selectedMetal?.variant?.id) return;
+  const selectedVariant = findVariant({
+    variants,
+    size_id: selectedSizeId,
+    metal_id: selectedMetalId,
+    diamond_id: selectedDiamondId,
+  });
 
-    const fetchPrice = async () => {
-      try {
-        setLoadingPrice(true);
-
-        const data = await customizeRing({
-          variant_id: selectedMetal.variant.id,
-          size: selectedSize?.size,
-          diamond_quality: selectedDiamond?.quality,
-        });
-
-        setApiPrice(data.final_price);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoadingPrice(false);
-      }
-    };
-
-    fetchPrice();
-  }, [selectedMetal, selectedSize, selectedDiamond]);
-
-  const displayPrice = apiPrice
-    ? formatPrice(apiPrice * quantity)
-    : "Calculating...";
+  const displayPrice = selectedVariant?.price
+    ? formatPrice(selectedVariant.price * quantity)
+    : "Select options";
 
   if (loading) {
     return (
@@ -132,7 +117,7 @@ const ProductDetailPage = () => {
             {/* PRICE */}
             <div className="price-section">
               <span className="current-price">
-                {loadingPrice ? "Updating..." : displayPrice}
+                {displayPrice}
               </span>
             </div>
 
@@ -143,20 +128,17 @@ const ProductDetailPage = () => {
               </div>
 
               <div className="metal-options">
-                {getMaterialOptions(product).map((material) => {
-                  const variant = getVariantByMaterial(product, material);
-                  const isSelected =
-                    selectedMetal?.variant?.id === variant?.id;
-
+                {options.metals.map((metal) => {
+                  const isSelected = selectedMetalId === metal.id;
                   return (
                     <div
-                      key={material}
+                      key={metal.id}
                       className={`metal-option ${
                         isSelected ? "selected" : ""
                       }`}
-                      onClick={() => setSelectedMetal({ variant })}
+                      onClick={() => setSelectedMetalId(metal.id)}
                     >
-                      <div className="metal-name">{material}</div>
+                      <div className="metal-name">{metal.title}</div>
                     </div>
                   );
                 })}
@@ -170,20 +152,21 @@ const ProductDetailPage = () => {
               </div>
 
               <div className="diamond-options">
-                {["IJ-SI", "FG-SI"].map((q) => {
-                  const isSelected = selectedDiamond?.quality === q;
-
+                {options.diamonds.map((diamond) => {
+                  const label =
+                    diamond?.quality && diamond?.karets
+                      ? `${diamond.quality} • ${diamond.karets}ct`
+                      : diamond?.quality || "Diamond";
+                  const isSelected = selectedDiamondId === diamond.id;
                   return (
                     <div
-                      key={q}
+                      key={diamond.id}
                       className={`diamond-option ${
                         isSelected ? "selected" : ""
                       }`}
-                      onClick={() =>
-                        setSelectedDiamond({ quality: q })
-                      }
+                      onClick={() => setSelectedDiamondId(diamond.id)}
                     >
-                      <div className="diamond-quality">{q}</div>
+                      <div className="diamond-quality">{label}</div>
                     </div>
                   );
                 })}
@@ -197,23 +180,34 @@ const ProductDetailPage = () => {
               </div>
 
               <div className="size-grid">
-                {[6, 7, 8, 9, 10, 11, 12].map((s) => {
-                  const isSelected = selectedSize?.size === s;
-
+                {options.sizes.map((size) => {
+                  const isSelected = selectedSizeId === size.id;
                   return (
                     <div
-                      key={s}
+                      key={size.id}
                       className={`size-option ${
                         isSelected ? "selected" : ""
                       }`}
-                      onClick={() => setSelectedSize({ size: s })}
+                      onClick={() => setSelectedSizeId(size.id)}
                     >
-                      <div className="size-number">{s}</div>
+                      <div className="size-number">{size.size}</div>
                     </div>
                   );
                 })}
               </div>
             </div>
+
+            {/* STOCK */}
+            {selectedVariant && (
+              <div className="quantity-section" style={{ marginTop: 0 }}>
+                <label>Stock</label>
+                <div style={{ paddingTop: 8 }}>
+                  {Number.isFinite(Number(selectedVariant.stock))
+                    ? `${selectedVariant.stock} available`
+                    : "In stock"}
+                </div>
+              </div>
+            )}
 
             {/* QUANTITY */}
             <div className="quantity-section">
@@ -260,11 +254,12 @@ const ProductDetailPage = () => {
       {showOrderModal && (
         <OrderModal
           product={product}
-          selectedSize={selectedSize}
-          selectedMetal={selectedMetal}
-          selectedDiamond={selectedDiamond}
+          selectedSize={options.sizes.find((s) => s.id === selectedSizeId) || null}
+          selectedMetal={options.metals.find((m) => m.id === selectedMetalId) || null}
+          selectedDiamond={options.diamonds.find((d) => d.id === selectedDiamondId) || null}
           quantity={quantity}
-          totalPrice={apiPrice}
+          totalPrice={selectedVariant?.price || null}
+          selectedCombinationId={selectedVariant?.id || null}
           onClose={() => setShowOrderModal(false)}
         />
       )}

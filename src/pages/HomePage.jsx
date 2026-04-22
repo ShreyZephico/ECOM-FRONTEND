@@ -1,6 +1,6 @@
 // src/pages/HomePage.jsx
 import React, { useEffect, useState } from 'react';
-import { fetchStoreProducts } from '../api/storeProducts';
+import { fetchCombinations, fetchStoreProducts } from '../api/storeProducts';
 import ProductCard from '../Components/ProductCard';
 import './HomePage.css';
 
@@ -14,8 +14,29 @@ const HomePage = () => {
       try {
         setLoading(true);
         setError('');
-        const storeProducts = await fetchStoreProducts();
-        setProducts(storeProducts);
+        const [storeProducts, combinations] = await Promise.all([
+          fetchStoreProducts(),
+          fetchCombinations(),
+        ]);
+
+        const minPriceByProductId = new Map();
+        combinations.forEach((c) => {
+          const productId = c?.product_id;
+          const price = Number(c?.price);
+          if (!productId || !Number.isFinite(price) || price <= 0) return;
+
+          const current = minPriceByProductId.get(productId);
+          if (!Number.isFinite(current) || price < current) {
+            minPriceByProductId.set(productId, price);
+          }
+        });
+
+        const enriched = storeProducts.map((p) => ({
+          ...p,
+          combination_min_price: minPriceByProductId.get(p.id) ?? null,
+        }));
+
+        setProducts(enriched);
       } catch (err) {
         console.error(err);
         setError('Unable to load products from the store API.');
