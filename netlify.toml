@@ -1,0 +1,11 @@
+[[redirects]]
+  from = "/store/*"
+  to = "https://your-ngrok-url.ngrok-free.dev/store/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://your-ngrok-url.ngrok-free.dev/:splat"
+  status = 200
+  force = true
