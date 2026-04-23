@@ -15,16 +15,37 @@ const Header = () => {
   return (
     <>
       <header className="header">
-
+        {/* Top Bar - Optional but adds elegance */}
+        <div className="header-top">
+          <div className="top-bar-content">
+            <span className="tagline">
+              ✨ <strong>CRAFTED WITH PASSION SINCE 2023</strong> ✨
+            </span>
+            <div className="shipping-info">
+              <span>📦 Free Shipping on Orders ₹50,000+</span>
+              <span>🔒 100% Certified Jewellery</span>
+            </div>
+          </div>
+        </div>
 
         {/* Main Header */}
         <div className="header-main">
           <div className="container">
             <div className="header-content">
-              {/* Logo */}
+              {/* Logo with your logo.png */}
               <div className="logo">
                 <a href="/">
-                  <h1>Treasure Chest</h1>
+                  <img
+                    src="/logo.png"
+                    alt="ZEPHICO Timeless Jewellery"
+                    className="logo-img"
+                  />
+                  <div className="logo-text">
+                    <span className="brand">ZEPHICO</span>
+                    <span className="est">EST. 2023 LONDON</span>
+                  </div>
+                  {/* Hidden h1 for SEO */}
+                  <h1 style={{ display: "none" }}>Treasure Chest</h1>
                 </a>
               </div>
 
@@ -33,7 +54,7 @@ const Header = () => {
                 <div className="search-bar">
                   <input
                     type="text"
-                    placeholder="Search"
+                    placeholder="Search for jewellery, collections..."
                     className="search-input"
                   />
                   <button className="search-icon">🔍</button>
@@ -48,9 +69,14 @@ const Header = () => {
                   className="nav-link delivery-btn"
                   onClick={() => setShowPincodeModal(true)}
                 >
-                  Delivery & Stores
+                  📍 Delivery & Stores
                 </button>
-                <span className="pincode-text">Enter Pincode</span>
+                <span
+                  className="pincode-text"
+                  onClick={() => setShowPincodeModal(true)}
+                >
+                  Enter Pincode
+                </span>
                 <button className="nav-link lang-btn">ENG ▼</button>
               </div>
             </div>
@@ -65,17 +91,19 @@ const Header = () => {
           onClick={() => setShowPincodeModal(false)}
         >
           <div className="pincode-modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Check Delivery Availability</h3>
+            <h3>✨ Check Delivery Availability</h3>
             <input
               type="text"
               placeholder="Enter Pincode"
               value={pincode}
               onChange={(e) => setPincode(e.target.value)}
               className="pincode-input"
+              maxLength="6"
+              pattern="[0-9]{6}"
             />
             <div className="modal-buttons">
               <button className="check-btn" onClick={handlePincodeSubmit}>
-                Check
+                Check Availability
               </button>
               <button
                 className="cancel-btn"
