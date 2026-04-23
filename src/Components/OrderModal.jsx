@@ -152,7 +152,9 @@ const OrderModal = ({
           <div className="order-summary-header">
             <div>
               <h3>{getProductTitle(product)}</h3>
-              <div className="order-summary-subtitle">Review your selection</div>
+              <div className="order-summary-subtitle">
+                Review your selection
+              </div>
             </div>
           </div>
 
@@ -294,7 +296,9 @@ const OrderModal = ({
                 <input
                   type="text"
                   value={currencyCode}
-                  onChange={(e) => setCurrencyCode(e.target.value.toLowerCase())}
+                  onChange={(e) =>
+                    setCurrencyCode(e.target.value.toLowerCase())
+                  }
                   placeholder="usd"
                   maxLength={3}
                 />

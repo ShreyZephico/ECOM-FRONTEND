@@ -7,6 +7,7 @@ import {
   getProductOptions,
 } from "../api/storeProducts";
 import OrderModal from "../Components/OrderModal";
+import TestSizePage from "./TestSizePage"; // ← IMPORT TestSizePage
 import {
   formatPrice,
   getCleanDescription,
@@ -20,7 +21,11 @@ const ProductDetailPage = () => {
 
   const [product, setProduct] = useState(null);
   const [variants, setVariants] = useState([]);
-  const [options, setOptions] = useState({ sizes: [], metals: [], diamonds: [] });
+  const [options, setOptions] = useState({
+    sizes: [],
+    metals: [],
+    diamonds: [],
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -30,6 +35,8 @@ const ProductDetailPage = () => {
 
   const [quantity, setQuantity] = useState(1);
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [showCustomiseModal, setShowCustomiseModal] = useState(false);
+  const [showSizeGuide, setShowSizeGuide] = useState(false); // ← STATE FOR SIZE GUIDE
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -72,191 +79,321 @@ const ProductDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="loader-container">
-        <div className="loader-spinner"></div>
-        <p>Loading product...</p>
+      <div className="pdp-loader-wrap">
+        <div className="pdp-loader-ring"></div>
+        <p className="pdp-loader-text">Loading product...</p>
       </div>
     );
   }
 
-  if (error) return <div>{error}</div>;
-  if (!product) return <div>Product not found</div>;
+  if (error) return <div className="pdp-error-state">{error}</div>;
+  if (!product) return <div className="pdp-error-state">Product not found</div>;
 
   const productTitle = getProductTitle(product);
   const mainImage = getProductImage(product);
   const description = getCleanDescription(product.description);
 
+  const selectedMetal = options.metals.find((m) => m.id === selectedMetalId);
+  const selectedSize = options.sizes.find((s) => s.id === selectedSizeId);
+
   return (
-    <div className="product-detail-page">
-      <div className="container">
-
+    <div className="pdp-root">
+      <div className="pdp-container">
         {/* Breadcrumb */}
-        <div className="breadcrumb">
-          <Link to="/">Home</Link> &gt; <span>{productTitle}</span>
-        </div>
+        <nav className="pdp-breadcrumb">
+          <Link className="pdp-breadcrumb-link" to="/">
+            Home
+          </Link>
+          <span className="pdp-breadcrumb-sep">›</span>
+          <span className="pdp-breadcrumb-current">{productTitle}</span>
+        </nav>
 
-        <div className="product-detail-layout">
-
-          {/* IMAGE */}
-          <div className="product-gallery">
-            <div className="main-image-container">
+        <div className="pdp-layout">
+          {/* ── LEFT: Gallery ── */}
+          <div className="pdp-gallery">
+            <div className="pdp-image-frame">
               <img
-                className="main-image"
+                className="pdp-main-img"
                 src={mainImage}
                 alt={productTitle}
               />
+              <div className="pdp-img-badge">In 713 Carts</div>
+            </div>
+
+            {/* Offer strip */}
+            <div className="pdp-offer-strip">
+              <span className="pdp-offer-icon">✦</span>
+              <span className="pdp-offer-text">
+                Flat 10% off on Making Charges
+              </span>
+              <span className="pdp-offer-expiry">Offer Expires in 7 days</span>
             </div>
           </div>
 
-          {/* INFO */}
-          <div className="product-detail-info">
-
-            <h1 className="product-title">{productTitle}</h1>
-            <p className="product-description">{description}</p>
-
-            {/* PRICE */}
-            <div className="price-section">
-              <span className="current-price">
-                {displayPrice}
-              </span>
+          {/* ── RIGHT: Info Panel ── */}
+          <div className="pdp-info-panel">
+            {/* Rating */}
+            <div className="pdp-rating-row">
+              <span className="pdp-stars">★★★★☆</span>
+              <span className="pdp-rating-count">4.7 · 3 Ratings</span>
             </div>
 
-            {/* METAL */}
-            <div className="selector-section">
-              <div className="selector-header">
-                <h3>Metal</h3>
-              </div>
+            <h1 className="pdp-product-title">{productTitle}</h1>
+            <p className="pdp-product-desc">{description}</p>
 
-              <div className="metal-options">
-                {options.metals.map((metal) => {
-                  const isSelected = selectedMetalId === metal.id;
-                  return (
-                    <div
-                      key={metal.id}
-                      className={`metal-option ${
-                        isSelected ? "selected" : ""
-                      }`}
-                      onClick={() => setSelectedMetalId(metal.id)}
-                    >
-                      <div className="metal-name">{metal.title}</div>
-                    </div>
-                  );
-                })}
-              </div>
+            {/* Price */}
+            <div className="pdp-price-block">
+              <span className="pdp-price-current">{displayPrice}</span>
+              <span className="pdp-price-tag">MRP incl. all taxes</span>
             </div>
 
-            {/* DIAMOND */}
-            <div className="selector-section">
-              <div className="selector-header">
-                <h3>Diamond</h3>
+            {/* ── Customise Pill (Image 1 style) ── */}
+            <div
+              className="pdp-customise-bar"
+              onClick={() => setShowCustomiseModal(true)}
+            >
+              <div className="pdp-customise-cell">
+                <span className="pdp-cell-label">Size</span>
+                <span className="pdp-cell-value">
+                  {selectedSize
+                    ? `${selectedSize.size} (${selectedSize.mm || "—"})`
+                    : "—"}
+                </span>
               </div>
-
-              <div className="diamond-options">
-                {options.diamonds.map((diamond) => {
-                  const label =
-                    diamond?.quality && diamond?.karets
-                      ? `${diamond.quality} • ${diamond.karets}ct`
-                      : diamond?.quality || "Diamond";
-                  const isSelected = selectedDiamondId === diamond.id;
-                  return (
-                    <div
-                      key={diamond.id}
-                      className={`diamond-option ${
-                        isSelected ? "selected" : ""
-                      }`}
-                      onClick={() => setSelectedDiamondId(diamond.id)}
-                    >
-                      <div className="diamond-quality">{label}</div>
-                    </div>
-                  );
-                })}
+              <div className="pdp-customise-divider" />
+              <div className="pdp-customise-cell">
+                <span className="pdp-cell-label">Metal</span>
+                <span className="pdp-cell-value">
+                  {selectedMetal?.title || "—"}
+                </span>
               </div>
+              <button className="pdp-customise-btn">CUSTOMISE</button>
             </div>
 
-            {/* SIZE */}
-            <div className="selector-section">
-              <div className="selector-header">
-                <h3>Size</h3>
-              </div>
-
-              <div className="size-grid">
-                {options.sizes.map((size) => {
-                  const isSelected = selectedSizeId === size.id;
-                  return (
-                    <div
-                      key={size.id}
-                      className={`size-option ${
-                        isSelected ? "selected" : ""
-                      }`}
-                      onClick={() => setSelectedSizeId(size.id)}
-                    >
-                      <div className="size-number">{size.size}</div>
-                    </div>
-                  );
-                })}
-              </div>
+            {/* Ring size hint - WITH CLICK HANDLER */}
+            <div className="pdp-size-hint">
+              <span>Not sure about your ring size?</span>
+              <button
+                className="pdp-size-learn-btn"
+                onClick={() => setShowSizeGuide(true)}
+              >
+                LEARN HOW ▶
+              </button>
             </div>
 
-            {/* STOCK */}
+            {/* Stock */}
             {selectedVariant && (
-              <div className="quantity-section" style={{ marginTop: 0 }}>
-                <label>Stock</label>
-                <div style={{ paddingTop: 8 }}>
+              <div className="pdp-stock-row">
+                <span className="pdp-stock-dot" />
+                <span className="pdp-stock-label">
                   {Number.isFinite(Number(selectedVariant.stock))
                     ? `${selectedVariant.stock} available`
                     : "In stock"}
-                </div>
+                </span>
               </div>
             )}
 
-            {/* QUANTITY */}
-            <div className="quantity-section">
-              <label>Quantity</label>
-
-              <div className="quantity-selector">
+            {/* Quantity */}
+            <div className="pdp-qty-row">
+              <span className="pdp-qty-label">Quantity</span>
+              <div className="pdp-qty-ctrl">
                 <button
-                  className="qty-btn"
-                  onClick={() =>
-                    setQuantity(Math.max(1, quantity - 1))
-                  }
+                  className="pdp-qty-btn"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 >
-                  -
+                  −
                 </button>
-
-                <span className="quantity">{quantity}</span>
-
+                <span className="pdp-qty-num">{quantity}</span>
                 <button
-                  className="qty-btn"
-                  onClick={() =>
-                    setQuantity(quantity + 1)
-                  }
+                  className="pdp-qty-btn"
+                  onClick={() => setQuantity(quantity + 1)}
                 >
                   +
                 </button>
               </div>
             </div>
 
-            {/* ACTION */}
-            <div className="action-buttons">
+            {/* CTA */}
+            <div className="pdp-cta-row">
               <button
-                className="buy-now-btn"
+                className="pdp-buy-btn"
                 onClick={() => setShowOrderModal(true)}
               >
                 Buy Now
               </button>
+              <button className="pdp-wish-btn" title="Wishlist">
+                ♡
+              </button>
+              <button className="pdp-share-btn" title="Share">
+                ⎘
+              </button>
             </div>
 
+            {/* Delivery strip */}
+            <div className="pdp-delivery-strip">
+              <span className="pdp-delivery-icon">📦</span>
+              <span>Delivery, Stores &amp; Trial</span>
+              <input
+                className="pdp-pincode-input"
+                placeholder="Enter Pincode"
+              />
+              <button className="pdp-locate-btn">Locate Me</button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* MODAL */}
+      {/* ══ CUSTOMISE MODAL ══ */}
+      {showCustomiseModal && (
+        <div
+          className="pdp-modal-backdrop"
+          onClick={() => setShowCustomiseModal(false)}
+        >
+          <div className="pdp-modal-sheet" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="pdp-modal-close"
+              onClick={() => setShowCustomiseModal(false)}
+            >
+              ✕
+            </button>
+
+            {/* Estimated Price */}
+            <div className="pdp-modal-price-row">
+              <span className="pdp-modal-label">Estimated price</span>
+              <div className="pdp-modal-prices">
+                <span className="pdp-modal-price-now">{displayPrice}</span>
+              </div>
+            </div>
+
+            <hr className="pdp-modal-divider" />
+
+            {/* Metal */}
+            <div className="pdp-modal-section">
+              <h3 className="pdp-modal-section-title">Choice of Metal</h3>
+              <div className="pdp-modal-metal-grid">
+                {options.metals.map((metal) => {
+                  const isSelected = selectedMetalId === metal.id;
+                  return (
+                    <div
+                      key={metal.id}
+                      className={`pdp-modal-metal-card ${isSelected ? "pdp-modal-metal-card--active" : ""}`}
+                      onClick={() => setSelectedMetalId(metal.id)}
+                    >
+                      <span className="pdp-modal-metal-name">
+                        {metal.title}
+                      </span>
+                      <span className="pdp-modal-metal-sub">Made to Order</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <hr className="pdp-modal-divider" />
+
+            {/* Diamond */}
+            {options.diamonds.length > 0 && (
+              <>
+                <div className="pdp-modal-section">
+                  <h3 className="pdp-modal-section-title">Choice of Diamond</h3>
+                  <div className="pdp-modal-diamond-grid">
+                    {options.diamonds.map((diamond) => {
+                      const label =
+                        diamond?.quality && diamond?.karets
+                          ? `${diamond.quality} • ${diamond.karets}ct`
+                          : diamond?.quality || "Diamond";
+                      const isSelected = selectedDiamondId === diamond.id;
+                      return (
+                        <div
+                          key={diamond.id}
+                          className={`pdp-modal-diamond-card ${isSelected ? "pdp-modal-diamond-card--active" : ""}`}
+                          onClick={() => setSelectedDiamondId(diamond.id)}
+                        >
+                          <span className="pdp-modal-diamond-name">
+                            {label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                <hr className="pdp-modal-divider" />
+              </>
+            )}
+
+            {/* Size */}
+            <div className="pdp-modal-section">
+              <div className="pdp-modal-size-header">
+                <h3 className="pdp-modal-section-title">Select Size</h3>
+                <button className="pdp-modal-size-guide">SIZE GUIDE</button>
+              </div>
+              <div className="pdp-modal-size-grid">
+                {options.sizes.map((size) => {
+                  const isSelected = selectedSizeId === size.id;
+                  return (
+                    <div
+                      key={size.id}
+                      className={`pdp-modal-size-card ${isSelected ? "pdp-modal-size-card--active" : ""}`}
+                      onClick={() => setSelectedSizeId(size.id)}
+                    >
+                      <span className="pdp-modal-size-num">{size.size}</span>
+                      <span className="pdp-modal-size-mm">
+                        {size.mm || size.size + " mm"}
+                      </span>
+                      <span className="pdp-modal-size-sub">
+                        {size.stock === 1 ? "Only 1 left!" : "Made to Order"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Confirm */}
+            <button
+              className="pdp-modal-confirm-btn"
+              onClick={() => setShowCustomiseModal(false)}
+            >
+              CONFIRM CUSTOMISATION
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ══ SIZE GUIDE MODAL - REUSING TestSizePage ══ */}
+      {showSizeGuide && (
+        <div
+          className="pdp-modal-backdrop"
+          onClick={() => setShowSizeGuide(false)}
+        >
+          <div
+            className="pdp-size-guide-modal-wrapper"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="pdp-modal-close"
+              onClick={() => setShowSizeGuide(false)}
+            >
+              ✕
+            </button>
+            <TestSizePage />
+          </div>
+        </div>
+      )}
+
+      {/* ORDER MODAL */}
       {showOrderModal && (
         <OrderModal
           product={product}
-          selectedSize={options.sizes.find((s) => s.id === selectedSizeId) || null}
-          selectedMetal={options.metals.find((m) => m.id === selectedMetalId) || null}
-          selectedDiamond={options.diamonds.find((d) => d.id === selectedDiamondId) || null}
+          selectedSize={
+            options.sizes.find((s) => s.id === selectedSizeId) || null
+          }
+          selectedMetal={
+            options.metals.find((m) => m.id === selectedMetalId) || null
+          }
+          selectedDiamond={
+            options.diamonds.find((d) => d.id === selectedDiamondId) || null
+          }
           quantity={quantity}
           totalPrice={selectedVariant?.price || null}
           selectedCombinationId={selectedVariant?.id || null}

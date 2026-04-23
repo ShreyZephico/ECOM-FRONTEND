@@ -33,7 +33,7 @@ const ProductCard = ({ product }) => {
           </span>
         </div>
         <h3 className="product-name">{productTitle}</h3>
-        <button className="check-delivery-btn">Check Delivery Date</button>
+        <button className="view-product-btn">View Product</button>
       </div>
     </div>
   );

@@ -59,9 +59,9 @@
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg,
-      rgba(10, 43, 46, 0.75) 0%,
-      rgba(10, 43, 46, 0.4) 50%,
-      rgba(212, 175, 55, 0.15) 100%);
+      rgba(1, 13, 14, 0.977) 0%,
+      rgba(0, 0, 0, 0.4) 50%,
+      rgba(0, 0, 0, 0.678) 100%);
   z-index: 1;
 }
 
@@ -73,6 +73,7 @@
   max-width: 900px;
   padding: 2rem;
   animation: fadeInUp 1.2s ease-out;
+  
 }
 
 @keyframes fadeInUp {
@@ -604,3 +605,4 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #E8B4B8;
 }
+

@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import TestSizePage from './pages/TestSizePage';
 import Header from './Components/Header';
+
 import './index.css';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/product/:id" element={<ProductDetailPage />} />
+        <Route path="/test-size" element={<TestSizePage />} />
       </Routes>
     </Router>
   );

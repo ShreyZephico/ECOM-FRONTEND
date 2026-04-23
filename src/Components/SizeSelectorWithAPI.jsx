@@ -61,7 +61,9 @@ const SizeSelectorWithAPI = ({ productId }) => {
   if (loading) return <div className="loader">Loading sizes...</div>;
   if (error) return <div className="error">{error}</div>;
   if (sizes.length === 0) {
-    return <div className="loader">No API sizes configured for this product.</div>;
+    return (
+      <div className="loader">No API sizes configured for this product.</div>
+    );
   }
 
   return (

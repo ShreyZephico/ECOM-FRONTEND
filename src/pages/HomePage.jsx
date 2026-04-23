@@ -122,10 +122,7 @@ const HomePage = () => {
           <div className="section-header">
             <span className="section-subtitle">Our Collections</span>
             <h2>Featured Masterpieces</h2>
-            <p>
-              Each piece tells a story of timeless beauty and exceptional
-              craftsmanship
-            </p>
+            
           </div>
           <div className="products-grid">
             {products.map((product) => (
