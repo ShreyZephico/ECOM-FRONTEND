@@ -2,7 +2,7 @@
 // CONFIG
 // ==============================
 
-const STORE_API_BASE_URL = import.meta?.env?.VITE_STORE_API_BASE_URL ?? "/api";
+const STORE_API_BASE_URL = import.meta.env.VITE_STORE_API_BASE_URL;
 
 const PUBLISHABLE_API_KEY = import.meta?.env?.VITE_STORE_PUBLISHABLE_API_KEY;
 
