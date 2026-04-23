@@ -24,6 +24,7 @@ const requestStore = async (path, options = {}) => {
     headers: {
       "Content-Type": "application/json",
       "x-publishable-api-key": PUBLISHABLE_API_KEY,
+      "ngrok-skip-browser-warning": "true",
       ...(options.headers || {}),
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
