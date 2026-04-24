@@ -28,7 +28,7 @@ const OrderModal = ({
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [currencyCode, setCurrencyCode] = useState("usd");
+  const [currencyCode, setCurrencyCode] = useState("inr");
 
   const [address1, setAddress1] = useState("");
   const [city, setCity] = useState("");
